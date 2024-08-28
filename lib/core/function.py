@@ -201,6 +201,7 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
             ratio = shapes[0][1][0][0]
 
             t = time_synchronized()
+
             det_out, da_seg_out, ll_seg_out= model(img)
             t_inf = time_synchronized() - t
             if batch_i > 0:
@@ -256,7 +257,7 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
 
             if config.TEST.PLOTS:
                 if batch_i == 0:
-                    for i in range(test_batch_size):
+                    for i in range(min(test_batch_size, len(paths))):
                         img_test = cv2.imread(paths[i])
                         da_seg_mask = da_seg_out[i][:, pad_h:height-pad_h, pad_w:width-pad_w].unsqueeze(0)
                         da_seg_mask = torch.nn.functional.interpolate(da_seg_mask, scale_factor=int(1/ratio), mode='bilinear')
@@ -434,9 +435,9 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
             print(pf % (names[c], seen, nt[c], p[i], r[i], ap50[i], ap[i]))
 
     # Print speeds
-    t = tuple(x / seen * 1E3 for x in (t_inf, t_nms, t_inf + t_nms)) + (imgsz, imgsz, batch_size)  # tuple
-    if not training:
-        print('Speed: %.1f/%.1f/%.1f ms inference/NMS/total per %gx%g image at batch-size %g' % t)
+    #t = tuple(x / seen * 1E3 for x in (t_inf, t_nms, t_inf + t_nms)) + (imgsz, imgsz, batch_size)  # tuple
+    #if not training:
+        #print('Speed: %.1f/%.1f/%.1f ms inference/NMS/total per %gx%g image at batch-size %g' % t)
 
     # Plots
     if config.TEST.PLOTS:
@@ -489,7 +490,6 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
     #print segmet_result
     t = [T_inf.avg, T_nms.avg]
     return da_segment_result, ll_segment_result, detect_result, losses.avg, maps, t
-        
 
 
 class AverageMeter(object):

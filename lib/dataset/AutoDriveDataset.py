@@ -96,8 +96,14 @@ class AutoDriveDataset(Dataset):
         cv2.warpAffine
         """
         data = self.db[idx]
-        img = cv2.imread(data["image"], cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
+        #print(len(self.db))
+        #print(data["image"])
+        img = cv2.imread(data["image"], cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_COLOR)        
+        #print(data["image"])
+        #print(img)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        #print("hi1")
+        #print(img)
         # seg_label = cv2.imread(data["mask"], 0)
         if self.cfg.num_seg_class == 3:
             seg_label = cv2.imread(data["mask"])

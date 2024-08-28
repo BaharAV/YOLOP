@@ -36,7 +36,7 @@ def parse_args():
                         help='log directory',
                         type=str,
                         default='runs/')
-    parser.add_argument('--weights', nargs='+', type=str, default='/data2/zwt/wd/YOLOP/runs/BddDataset/detect_and_segbranch_whole/epoch-169.pth', help='model.pth path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default='weights/End-to-end.pth', help='model.pth path(s)')
     parser.add_argument('--conf_thres', type=float, default=0.001, help='object confidence threshold')
     parser.add_argument('--iou_thres', type=float, default=0.6, help='IOU threshold for NMS')
     args = parser.parse_args()
@@ -83,7 +83,8 @@ def main():
     model_dict = model.state_dict()
     checkpoint_file = args.weights
     logger.info("=> loading checkpoint '{}'".format(checkpoint_file))
-    checkpoint = torch.load(checkpoint_file)
+    #checkpoint = torch.load(checkpoint_file)
+    checkpoint = torch.load(checkpoint_file[0])
     checkpoint_dict = checkpoint['state_dict']
     # checkpoint_dict = {k: v for k, v in checkpoint['state_dict'].items() if k.split(".")[1] in det_idx_range}
     model_dict.update(checkpoint_dict)
@@ -93,6 +94,7 @@ def main():
     model = model.to(device)
     model.gr = 1.0
     model.nc = 1
+
     print('bulid model finished')
 
     print("begin to load data")
@@ -101,6 +103,7 @@ def main():
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
     )
 
+    #print(cfg.MODEL.IMAGE_SIZE)
     valid_dataset = eval('dataset.' + cfg.DATASET.DATASET)(
         cfg=cfg,
         is_train=False,
@@ -110,7 +113,6 @@ def main():
             normalize,
         ])
     )
-
     # valid_loader = DataLoaderX(
     #     valid_dataset,
     #     batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),

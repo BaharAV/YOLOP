@@ -5,7 +5,7 @@ from yacs.config import CfgNode as CN
 _C = CN()
 
 _C.LOG_DIR = 'runs/'
-_C.GPUS = (0,1)     
+_C.GPUS = (0,1) #update ids ???     
 _C.WORKERS = 8
 _C.PIN_MEMORY = False
 _C.PRINT_FREQ = 20
@@ -26,7 +26,7 @@ _C.MODEL = CN(new_allowed=True)
 _C.MODEL.NAME = ''
 _C.MODEL.STRU_WITHSHARE = False     #add share_block to segbranch
 _C.MODEL.HEADS_NAME = ['']
-_C.MODEL.PRETRAINED = ""
+_C.MODEL.PRETRAINED = ".../yolop/runs/BddDataset/checkpoint.pth"  # update full path
 _C.MODEL.PRETRAINED_DET = ""
 _C.MODEL.IMAGE_SIZE = [640, 640]  # width * height, ex: 192 * 256
 _C.MODEL.EXTRA = CN(new_allowed=True)
@@ -50,16 +50,16 @@ _C.LOSS.LL_IOU_GAIN = 0.2 # lane line iou loss gain
 
 # DATASET related params
 _C.DATASET = CN(new_allowed=True)
-_C.DATASET.DATAROOT = '/home/zwt/bdd/bdd100k/images/100k'       # the path of images folder
-_C.DATASET.LABELROOT = '/home/zwt/bdd/bdd100k/labels/100k'      # the path of det_annotations folder
-_C.DATASET.MASKROOT = '/home/zwt/bdd/bdd_seg_gt'                # the path of da_seg_annotations folder
-_C.DATASET.LANEROOT = '/home/zwt/bdd/bdd_lane_gt'               # the path of ll_seg_annotations folder
+_C.DATASET.DATAROOT = ".../yolop/dataset/images"  # update full address
+_C.DATASET.LABELROOT = ''   
+_C.DATASET.MASKROOT = ".../yolop/dataset/mask"    # update full address
+_C.DATASET.LANEROOT = ''               
 _C.DATASET.DATASET = 'BddDataset'
 _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'
 _C.DATASET.DATA_FORMAT = 'jpg'
 _C.DATASET.SELECT_DATA = False
-_C.DATASET.ORG_IMG_SIZE = [720, 1280]
+_C.DATASET.ORG_IMG_SIZE = [720, 1280] #[720, 1280]
 
 # training data augmentation
 _C.DATASET.FLIP = True
@@ -107,7 +107,7 @@ _C.TRAIN.ENC_SEG_ONLY = False       # Only train encoder and two segmentation br
 _C.TRAIN.ENC_DET_ONLY = False       # Only train encoder and detection branch
 
 # Single task 
-_C.TRAIN.DRIVABLE_ONLY = False      # Only train da_segmentation task
+_C.TRAIN.DRIVABLE_ONLY = True      # Only train da_segmentation task
 _C.TRAIN.LANE_ONLY = False          # Only train ll_segmentation task
 _C.TRAIN.DET_ONLY = False          # Only train detection task
 
@@ -137,17 +137,17 @@ def update_config(cfg, args):
     if args.logDir:
         cfg.LOG_DIR = args.logDir
     
-    # if args.conf_thres:
-    #     cfg.TEST.NMS_CONF_THRESHOLD = args.conf_thres
+    if args.conf_thres:
+        cfg.TEST.NMS_CONF_THRESHOLD = args.conf_thres
 
-    # if args.iou_thres:
-    #     cfg.TEST.NMS_IOU_THRESHOLD = args.iou_thres
+    if args.iou_thres:
+        cfg.TEST.NMS_IOU_THRESHOLD = args.iou_thres
     
 
 
-    # cfg.MODEL.PRETRAINED = os.path.join(
-    #     cfg.DATA_DIR, cfg.MODEL.PRETRAINED
-    # )
+    cfg.MODEL.PRETRAINED = os.path.join(
+         "", cfg.MODEL.PRETRAINED
+    ) #cfg.DATA_DIR
     #
     # if cfg.TEST.MODEL_FILE:
     #     cfg.TEST.MODEL_FILE = os.path.join(

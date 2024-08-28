@@ -83,7 +83,6 @@ def main():
     #print(rank)
     # TODO: handle distributed training logger
     # set the logger, tb_log_dir means tensorboard logdir
-
     logger, final_output_dir, tb_log_dir = create_logger(
         cfg, cfg.LOG_DIR, 'train', rank=rank)
 
@@ -185,7 +184,7 @@ def main():
             logger.info("=> loaded checkpoint '{}' (epoch {})".format(
                 checkpoint_file, checkpoint['epoch']))
             #cfg.NEED_AUTOANCHOR = False     #disable autoanchor
-        # model = model.to(device)
+        model = model.to(device)
 
         if cfg.TRAIN.SEG_ONLY:  #Only train two segmentation branchs
             logger.info('freeze encoder and Det head...')
@@ -212,7 +211,7 @@ def main():
                     print('freezing %s' % k)
                     v.requires_grad = False
 
-        if cfg.TRAIN.ENC_DET_ONLY or cfg.TRAIN.DET_ONLY:    # Only train encoder and detection branchs
+        if cfg.TRAIN.ENC_DET_ONLY or cfg.TRAIN.DET_ONLY: # Only train encoder and detection branchs
             logger.info('freeze two Seg heads...')
             for k, v in model.named_parameters():
                 v.requires_grad = True  # train all layers
@@ -232,6 +231,7 @@ def main():
 
         if cfg.TRAIN.DRIVABLE_ONLY:
             logger.info('freeze encoder and Det head and Ll_Seg heads...')
+            print("ok")
             # print(model.named_parameters)
             for k, v in model.named_parameters():
                 v.requires_grad = True  # train all layers
@@ -257,7 +257,6 @@ def main():
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
     )
-
     train_dataset = eval('dataset.' + cfg.DATASET.DATASET)(
         cfg=cfg,
         is_train=True,
@@ -268,7 +267,6 @@ def main():
         ])
     )
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset) if rank != -1 else None
-
     train_loader = DataLoaderX(
         train_dataset,
         batch_size=cfg.TRAIN.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
@@ -279,7 +277,6 @@ def main():
         collate_fn=dataset.AutoDriveDataset.collate_fn
     )
     num_batch = len(train_loader)
-
     if rank in [-1, 0]:
         valid_dataset = eval('dataset.' + cfg.DATASET.DATASET)(
             cfg=cfg,

@@ -61,6 +61,10 @@ class LoadImages:  # for inference
             # Read video
             self.mode = 'video'
             ret_val, img0 = self.cap.read()
+            try:
+                img0 = cv2.cvtColor(img0, cv2.COLOR_BGR2RGB)
+            except cv2.error as e:
+                print("----------------------------------------->err 1")
             if not ret_val:
                 self.count += 1
                 self.cap.release()
@@ -70,6 +74,10 @@ class LoadImages:  # for inference
                     path = self.files[self.count]
                     self.new_video(path)
                     ret_val, img0 = self.cap.read()
+                    try:
+                        img0 = cv2.cvtColor(img0, cv2.COLOR_BGR2RGB)
+                    except cv2.error as e:
+                        print("----------------------------------------->err 2")
             h0, w0 = img0.shape[:2]
 
             self.frame += 1
@@ -79,7 +87,7 @@ class LoadImages:  # for inference
             # Read image
             self.count += 1
             img0 = cv2.imread(path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)  # BGR
-            #img0 = cv2.cvtColor(img0, cv2.COLOR_BGR2RGB)
+            img0 = cv2.cvtColor(img0, cv2.COLOR_BGR2RGB)
             assert img0 is not None, 'Image Not Found ' + path
             print('image %g/%g %s: \n' % (self.count, self.nf, path), end='')
             h0, w0 = img0.shape[:2]
